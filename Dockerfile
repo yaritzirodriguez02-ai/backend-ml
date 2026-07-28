@@ -1,5 +1,5 @@
 # Etapa 1: Construcción (Builder)
-FROM eclipse-temurin:21-jdk-alpine AS builder
+FROM eclipse-temurin:25-jdk-alpine AS builder
 WORKDIR /app
 # Copiar el wrapper de Maven y los archivos de configuración
 COPY mvnw .
@@ -10,7 +10,7 @@ COPY src src
 RUN chmod +x ./mvnw
 RUN ./mvnw clean package -DskipTests
 # Etapa 2: Imagen final para producción (ligera)
-FROM eclipse-temurin:21-jre-alpine
+FROM eclipse-temurin:25-jre-alpine
 WORKDIR /app
 # Copiar solo el archivo .jar generado en la etapa anterior
 COPY --from=builder /app/target/*.jar app.jar
