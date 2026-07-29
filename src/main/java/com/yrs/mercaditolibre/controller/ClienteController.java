@@ -15,6 +15,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.yrs.mercaditolibre.modelo.ClienteEntity;
+import com.yrs.mercaditolibre.modelo.ProductoEntity;
+import com.yrs.mercaditolibre.repository.ProductoRepository;
 import com.yrs.mercaditolibre.services.ClienteService;
 
 import lombok.RequiredArgsConstructor;
@@ -26,6 +28,7 @@ import lombok.RequiredArgsConstructor;
 public class ClienteController {
 
     private final ClienteService servicio;
+    private final ProductoRepository productoRepository; // Repositorio inyectado para consultar las compras
 
     // endpoint para ver todos los clientes
     @GetMapping("/")
@@ -52,7 +55,7 @@ public class ClienteController {
         return new ResponseEntity<>(nuevo, HttpStatus.CREATED); // crear 201
     }
 
-    // actualizar
+    // actualizar perfil / cliente
     @PutMapping("/{id}")
     public ResponseEntity<?> actualizar(@PathVariable Long id, @RequestBody ClienteEntity cliente) {
         try {
@@ -63,4 +66,10 @@ public class ClienteController {
         }
     }
 
+    // NUEVO ENDPOINT: Obtener compras del cliente logueado (Para clienteDashboard.jsx)
+    @GetMapping("/{clienteId}/mis-compras")
+    public ResponseEntity<List<ProductoEntity>> obtenerMisCompras(@PathVariable Long clienteId) {
+        List<ProductoEntity> productos = productoRepository.findProductosCompradosPorCliente(clienteId);
+        return ResponseEntity.ok(productos);
+    }
 }
