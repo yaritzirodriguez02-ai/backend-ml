@@ -22,7 +22,7 @@ import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequestMapping("/api/v1/productos")//mapeo genearl de productos
-@CrossOrigin(origins = "*")//permiso a react
+@CrossOrigin(origins = "http://localhost:5173")//permiso a react
 @RequiredArgsConstructor
 public class ProductoController {
 private final ProductoService servicio;

@@ -44,6 +44,7 @@ public class SecurityConfig {
         return authenticationConfiguration.getAuthenticationManager();
     }
 
+
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
@@ -87,7 +88,7 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(Arrays.asList("http://localhost:5173", "http://mercaditoy.2.24.105.6.sslip.io"));
+       configuration.setAllowedOriginPatterns(Arrays.asList("http://localhost:5173", "http://mercaditoy.2.24.105.6.sslip.io"));
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(Arrays.asList("*")); // Permite todos los encabezados necesarios
         configuration.setExposedHeaders(Collections.singletonList("Authorization"));
