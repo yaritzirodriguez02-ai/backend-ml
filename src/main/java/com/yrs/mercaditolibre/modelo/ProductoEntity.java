@@ -1,4 +1,5 @@
 package com.yrs.mercaditolibre.modelo;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -13,37 +14,34 @@ import lombok.*;
 @Entity
 @Table(name = "producto")
 @Getter @Setter @AllArgsConstructor @NoArgsConstructor @Builder
-
-
 public class ProductoEntity {
-@Id
-@GeneratedValue(strategy = GenerationType.IDENTITY)
-private Long id;
 
-@Column(nullable = false,  length = 100)
-private String nombre;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
-@Column(nullable = false)
-private String descripcion; 
+    @Column(nullable = false, length = 100)
+    private String nombre;
 
-@Column(nullable = false)
-private double precio;
+    @Column(nullable = false)
+    private String descripcion; 
 
-@Column(nullable = false)
-private Integer stock;
+    @Column(nullable = false)
+    private double precio;
 
-private String imagenURL;
+    @Column(nullable = false)
+    private Integer stock;
 
+    // --- CAMBIO AQUÍ: Forzamos el mapeo a la columna correcta de MySQL ---
+    @Column(name = "imagenurl")
+    private String imagenURL;
 
+    //------ Relaciones de llaves FK------
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "categoria_id") // llave foranea de categoria
+    private CategoriasEntity categoria;
 
-//------ Relaciones de llaves FK------
-@ManyToOne(fetch = FetchType.EAGER)
-@JoinColumn(name = "categoria_id") //llave foranea de categoria
-private CategoriasEntity categoria;
-
-@ManyToOne(fetch = FetchType.EAGER)
-@JoinColumn(name = "proveedor_id") //llave foranea de categoria
-private ProveedorEntity proveedor;
-
-
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "proveedor_id") // llave foranea de proveedor
+    private ProveedorEntity proveedor;
 }
