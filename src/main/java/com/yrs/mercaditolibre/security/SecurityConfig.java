@@ -44,7 +44,6 @@ public class SecurityConfig {
         return authenticationConfiguration.getAuthenticationManager();
     }
 
-
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
@@ -52,14 +51,16 @@ public class SecurityConfig {
             .csrf(AbstractHttpConfigurer::disable)
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(auth -> auth
-                // PERMITIR PETICIONES PREFLIGHT (OPTIONS) PARA EVITAR BLOQUEO CORS
+                // 1. PERMITIR TODAS LAS PETICIONES PREFLIGHT (OPTIONS)
                 .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll() 
                 
+                // 2. ENDPOINTS PÚBLICOS (Incluimos explícitamente las rutas de lectura)
                 .requestMatchers("/api/v1/auth/**").permitAll()
-                .requestMatchers(HttpMethod.GET, "/api/v1/productos/**").permitAll()
-                .requestMatchers(HttpMethod.GET, "/api/v1/categorias/**").permitAll()
-                .requestMatchers(HttpMethod.GET, "/api/v1/proveedores/**").permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/v1/productos", "/api/v1/productos/**").permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/v1/categorias", "/api/v1/categorias/**").permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/v1/proveedores", "/api/v1/proveedores/**").permitAll()
                 
+                // 3. RUTAS PROTEGIDAS PARA ADMINISTRADOR
                 .requestMatchers(HttpMethod.POST, "/api/v1/productos/**").hasAuthority("ROLE_ADMIN")
                 .requestMatchers(HttpMethod.PUT, "/api/v1/productos/**").hasAuthority("ROLE_ADMIN")
                 .requestMatchers(HttpMethod.DELETE, "/api/v1/productos/**").hasAuthority("ROLE_ADMIN")
@@ -72,7 +73,8 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.PUT, "/api/v1/proveedores/**").hasAuthority("ROLE_ADMIN")
                 .requestMatchers(HttpMethod.DELETE, "/api/v1/proveedores/**").hasAuthority("ROLE_ADMIN")
                 
-                .requestMatchers(HttpMethod.POST, "/api/v1/ventas").hasAnyAuthority("ROLE_CLIENTE", "ROLE_ADMIN")
+                // 4. VENTAS Y PAGOS
+                .requestMatchers(HttpMethod.POST, "/api/v1/ventas", "/api/v1/ventas/**").hasAnyAuthority("ROLE_CLIENTE", "ROLE_ADMIN")
                 .requestMatchers(HttpMethod.GET, "/api/v1/ventas").hasAuthority("ROLE_ADMIN")
                 .requestMatchers(HttpMethod.GET, "/api/v1/ventas/mis-compras").hasAuthority("ROLE_CLIENTE")
                 .requestMatchers("/api/v1/pagos/**").hasAnyAuthority("ROLE_CLIENTE", "ROLE_ADMIN")
@@ -88,9 +90,16 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-       configuration.setAllowedOriginPatterns(Arrays.asList("http://localhost:5173", "http://mercaditoy.2.24.105.6.sslip.io"));
-        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-        configuration.setAllowedHeaders(Arrays.asList("*")); // Permite todos los encabezados necesarios
+        
+        // Habilitamos patrones de orígenes para entorno local y Coolify
+        configuration.setAllowedOriginPatterns(Arrays.asList(
+            "http://localhost:5173", 
+            "http://mercaditoy.2.24.105.6.sslip.io",
+            "http://*.sslip.io"
+        ));
+        
+        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS", "HEAD"));
+        configuration.setAllowedHeaders(Arrays.asList("*")); // Permite Authorization, Content-Type, etc.
         configuration.setExposedHeaders(Collections.singletonList("Authorization"));
         configuration.setAllowCredentials(true);
         

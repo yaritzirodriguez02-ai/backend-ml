@@ -21,7 +21,7 @@ import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequestMapping("/api/v1/ventas") // mapeo general de ventas
-@CrossOrigin(origins = "http://localhost:5173") // permiso a react
+//@CrossOrigin(origins = "http://localhost:5173") // permiso a react
 @RequiredArgsConstructor
 public class VentasController {
 
