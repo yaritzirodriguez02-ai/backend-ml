@@ -103,12 +103,16 @@ public class SecurityConfig {
         // Habilitamos patrones de orígenes para entorno local y Coolify
         configuration.setAllowedOriginPatterns(Arrays.asList(
             "http://localhost:5173",
+            "http://mercaditoa.2.24.105.6.sslip.io",  // <-- CORREGIDO (mercaditoa)
+            "https://mercaditoa.2.24.105.6.sslip.io", // <-- Agregado HTTPS
             "http://mercaditoy.2.24.105.6.sslip.io",
-            "http://*.sslip.io"
+            "https://mercaditoy.2.24.105.6.sslip.io",
+            "http://*.sslip.io",
+            "https://*.sslip.io"
         ));
 
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS", "HEAD"));
-        configuration.setAllowedHeaders(Arrays.asList("*")); // Permite Authorization, Content-Type, etc.
+        configuration.setAllowedHeaders(Arrays.asList("*")); 
         configuration.setExposedHeaders(Collections.singletonList("Authorization"));
         configuration.setAllowCredentials(true);
 
