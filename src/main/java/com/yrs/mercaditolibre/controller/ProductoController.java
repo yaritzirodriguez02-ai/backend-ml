@@ -30,11 +30,11 @@ private final ProductoService servicio;
 //endpoint para ver todos los productos
 @GetMapping("/")
 public ResponseEntity<List<ProductoEntity>> Listar() {
-    return ResponseEntity.ok(servicio.ObtenerTodos());
+    return ResponseEntity.ok(servicio.obtenerTodos());
 }
 @GetMapping("/{id}")
 public ResponseEntity<ProductoEntity> ObtenerDetalles(@PathVariable Long id) {
-    return ResponseEntity.ok(servicio.ObtenerPorId(id));
+    return ResponseEntity.ok(servicio.obtenerPorId(id));
 
 }
 //eliminar por id
@@ -51,12 +51,9 @@ public ResponseEntity<ProductoEntity> crearProducto(@RequestBody ProductoEntity 
 }
 //actualizar 
 @PutMapping("/{id}")
-public ResponseEntity<?> actualizar(@PathVariable Long id, @RequestBody ProductoEntity producto){
-  try{
-    ProductoEntity productoAct = servicio.actualizarProducto(id,producto);
-  return ResponseEntity.ok(productoAct);  
-  }catch(RuntimeException e){
-    return ResponseEntity.status(404).body(e.getMessage());
-  }
+public ResponseEntity<ProductoEntity> actualizarProducto(@PathVariable Long id, @RequestBody ProductoEntity productoDetalles) {
+    ProductoEntity actualizado = servicio.actualizarProducto(id, productoDetalles);
+    return ResponseEntity.ok(actualizado);
+}
 
-}}
+}

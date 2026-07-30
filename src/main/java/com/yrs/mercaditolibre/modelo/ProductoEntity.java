@@ -32,9 +32,9 @@ public class ProductoEntity {
     @Column(nullable = false)
     private Integer stock;
 
-    // --- CAMBIO AQUÍ: Forzamos el mapeo a la columna correcta de MySQL ---
+    // Mapeo directo a la columna "imagenurl" de MySQL
     @Column(name = "imagenurl")
-    private String imagenURL;
+    private String imagenUrl;   
 
     //------ Relaciones de llaves FK------
     @ManyToOne(fetch = FetchType.EAGER)
