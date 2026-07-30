@@ -21,7 +21,7 @@ import com.yrs.mercaditolibre.services.VentasService;
 @RestController
 @RequestMapping ("/api/v1/pagos")
 public class PagoController {
-    @Value ("$stripe.apikey.secret")
+    @Value("${stripe.apikey.secret}")
     private String stripeSecretKey;
 
 private final VentasService ventasService;

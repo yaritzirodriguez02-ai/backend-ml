@@ -112,4 +112,46 @@ public class VentasService {
         BeanUtils.copyProperties(detalleVentaEntity, ventaExistente, "id");
         return repository.save(ventaExistente);
     }
+
+    @Transactional
+    public VentasEntity cancelarVenta(Long idVenta) {
+        VentasEntity venta = repository.findById(idVenta)
+            .orElseThrow(() -> new RuntimeException("Venta no encontrada con ID: " + idVenta));
+
+        if (!"PENDIENTE".equals(venta.getEstadoPago())) {
+            throw new RuntimeException("Solo se pueden cancelar ventas con estado PENDIENTE");
+        }
+
+        venta.setEstadoPago("CANCELADO");
+
+        // Restaurar el stock de los productos
+        for (DetalleVentaEntity detalle : venta.getDetalleVentas()) {
+            ProductoEntity producto = detalle.getProducto();
+            producto.setStock(producto.getStock() + detalle.getCantidad());
+            productoRepository.save(producto);
+        }
+
+        return repository.save(venta);
+    }
+
+    @Transactional
+    public VentasEntity reembolsarVenta(Long idVenta) {
+        VentasEntity venta = repository.findById(idVenta)
+            .orElseThrow(() -> new RuntimeException("Venta no encontrada con ID: " + idVenta));
+
+        if (!"PAGADO".equals(venta.getEstadoPago())) {
+            throw new RuntimeException("Solo se pueden reembolsar ventas con estado PAGADO");
+        }
+
+        venta.setEstadoPago("REEMBOLSADO");
+
+        // Restaurar el stock de los productos
+        for (DetalleVentaEntity detalle : venta.getDetalleVentas()) {
+            ProductoEntity producto = detalle.getProducto();
+            producto.setStock(producto.getStock() + detalle.getCantidad());
+            productoRepository.save(producto);
+        }
+
+        return repository.save(venta);
+    }
 }

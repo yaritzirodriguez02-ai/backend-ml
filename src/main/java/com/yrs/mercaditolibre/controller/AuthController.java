@@ -13,7 +13,9 @@ import org.springframework.web.bind.annotation.RestController;
 import com.yrs.mercaditolibre.dto.AuthRequest;
 import com.yrs.mercaditolibre.dto.AuthResponse;
 import com.yrs.mercaditolibre.dto.RegistroRequest;
+import com.yrs.mercaditolibre.modelo.ClienteEntity;
 import com.yrs.mercaditolibre.modelo.UsuarioEntity;
+import com.yrs.mercaditolibre.repository.ClienteRepository;
 import com.yrs.mercaditolibre.security.JwtTokenProvider;
 import com.yrs.mercaditolibre.services.UsuarioService;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -27,12 +29,15 @@ public class AuthController {
     private final AuthenticationManager authenticationManager;
     private final JwtTokenProvider jwtTokenProvider;
     private final UsuarioService usuarioService;
+    private final ClienteRepository clienteRepository;
 
     public AuthController(AuthenticationManager authenticationManager, 
-        JwtTokenProvider jwtTokenProvider, UsuarioService usuarioService) {
+        JwtTokenProvider jwtTokenProvider, UsuarioService usuarioService,
+        ClienteRepository clienteRepository) {
         this.authenticationManager = authenticationManager;
         this.jwtTokenProvider = jwtTokenProvider;
         this.usuarioService = usuarioService;
+        this.clienteRepository = clienteRepository;
     }
 
     @PostMapping("/login")
@@ -50,8 +55,16 @@ public class AuthController {
             .map(auth -> auth.getAuthority())
             .orElse("ROLE_CLIENTE");
 
+            // Buscar el clienteId asociado al username (si existe)
+            Long clienteId = null;
+            if ("ROLE_CLIENTE".equals(authority)) {
+                clienteId = clienteRepository.findByEmail(userPrincipal.getUsername())
+                    .map(ClienteEntity::getId)
+                    .orElse(null);
+            }
+
             return ResponseEntity.ok(new AuthResponse(token,
-                 userPrincipal.getUsername(), userPrincipal.getUsername(), authority));
+                 userPrincipal.getUsername(), userPrincipal.getUsername(), authority, clienteId));
             
       
     }
