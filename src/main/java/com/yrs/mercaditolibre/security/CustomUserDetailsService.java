@@ -32,7 +32,7 @@ public class CustomUserDetailsService implements UserDetailsService {
     usuario.getUsername(), 
     usuario.getPassword(),
     Collections.singletonList(new SimpleGrantedAuthority(
-        "ROLE_" + usuario.getRol().name()
+        usuario.getRol().name() 
     ))
 );
     }
