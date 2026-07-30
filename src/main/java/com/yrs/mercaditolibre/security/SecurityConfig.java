@@ -52,19 +52,19 @@ public class SecurityConfig {
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(auth -> auth
                 // 1. PERMITIR TODAS LAS PETICIONES PREFLIGHT (OPTIONS)
-                .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll() 
-                
+                .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+
                 // 2. ENDPOINTS PÚBLICOS (Incluimos explícitamente las rutas de lectura)
                 .requestMatchers("/api/v1/auth/**").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/v1/productos", "/api/v1/productos/**").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/v1/categorias", "/api/v1/categorias/**").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/v1/proveedores", "/api/v1/proveedores/**").permitAll()
-                
+
                 // 3. RUTAS PROTEGIDAS PARA ADMINISTRADOR
                 .requestMatchers(HttpMethod.POST, "/api/v1/productos/**").hasAuthority("ROLE_ADMIN")
                 .requestMatchers(HttpMethod.PUT, "/api/v1/productos/**").hasAuthority("ROLE_ADMIN")
                 .requestMatchers(HttpMethod.DELETE, "/api/v1/productos/**").hasAuthority("ROLE_ADMIN")
-                
+
                 .requestMatchers(HttpMethod.POST, "/api/v1/categorias/**").hasAuthority("ROLE_ADMIN")
                 .requestMatchers(HttpMethod.PUT, "/api/v1/categorias/**").hasAuthority("ROLE_ADMIN")
                 .requestMatchers(HttpMethod.DELETE, "/api/v1/categorias/**").hasAuthority("ROLE_ADMIN")
@@ -72,13 +72,22 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.POST, "/api/v1/proveedores/**").hasAuthority("ROLE_ADMIN")
                 .requestMatchers(HttpMethod.PUT, "/api/v1/proveedores/**").hasAuthority("ROLE_ADMIN")
                 .requestMatchers(HttpMethod.DELETE, "/api/v1/proveedores/**").hasAuthority("ROLE_ADMIN")
-                
+
+                // 3.1 GESTIÓN DE USUARIOS (crear admins/clientes desde el panel) — solo Admin
+                .requestMatchers("/api/v1/usuarios/**").hasAuthority("ROLE_ADMIN")
+
+                // 3.2 GESTIÓN DE CLIENTES (listar/crear/editar/eliminar) — solo Admin
+                .requestMatchers(HttpMethod.GET, "/api/v1/clientes/**").hasAuthority("ROLE_ADMIN")
+                .requestMatchers(HttpMethod.POST, "/api/v1/clientes/**").hasAuthority("ROLE_ADMIN")
+                .requestMatchers(HttpMethod.PUT, "/api/v1/clientes/**").hasAuthority("ROLE_ADMIN")
+                .requestMatchers(HttpMethod.DELETE, "/api/v1/clientes/**").hasAuthority("ROLE_ADMIN")
+
                 // 4. VENTAS Y PAGOS
                 .requestMatchers(HttpMethod.POST, "/api/v1/ventas", "/api/v1/ventas/**").hasAnyAuthority("ROLE_CLIENTE", "ROLE_ADMIN")
                 .requestMatchers(HttpMethod.GET, "/api/v1/ventas").hasAuthority("ROLE_ADMIN")
                 .requestMatchers(HttpMethod.GET, "/api/v1/ventas/mis-compras").hasAuthority("ROLE_CLIENTE")
                 .requestMatchers("/api/v1/pagos/**").hasAnyAuthority("ROLE_CLIENTE", "ROLE_ADMIN")
-                
+
                 .anyRequest().authenticated()
             );
 
@@ -90,19 +99,19 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        
+
         // Habilitamos patrones de orígenes para entorno local y Coolify
         configuration.setAllowedOriginPatterns(Arrays.asList(
-            "http://localhost:5173", 
+            "http://localhost:5173",
             "http://mercaditoy.2.24.105.6.sslip.io",
             "http://*.sslip.io"
         ));
-        
+
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS", "HEAD"));
         configuration.setAllowedHeaders(Arrays.asList("*")); // Permite Authorization, Content-Type, etc.
         configuration.setExposedHeaders(Collections.singletonList("Authorization"));
         configuration.setAllowCredentials(true);
-        
+
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
         return source;
